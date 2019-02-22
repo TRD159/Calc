@@ -36,12 +36,18 @@ public class CalcFrame extends JFrame {
     JButton btn_sub = new JButton("-");
     JButton btn_add = new JButton("+");
 
+    JButton btn_dec = new JButton(".");
+    JButton btn_neg = new JButton("+/-");
+
     JButton btn_clear = new JButton("C");
     JButton btn_equ = new JButton("=");
 
     ButtonGroup oper = new ButtonGroup();
 
-    boolean stringF = true;
+    double op = 0;
+    double in = 0;
+
+    boolean dec = false;
 
     public CalcFrame(String name) {
         super(name);
@@ -80,9 +86,16 @@ public class CalcFrame extends JFrame {
         btn_8.addActionListener(e -> input(8));
         btn_9.addActionListener(e -> input(9));
 
-
-
         btn_add.addActionListener(e -> add());
+        btn_sub.addActionListener(e -> sub());
+        btn_mult.addActionListener(e -> mult());
+        btn_div.addActionListener(e -> div());
+
+        btn_dec.addActionListener(e -> dec());
+        btn_neg.addActionListener(e -> neg());
+
+        btn_equ.addActionListener(e -> calc());
+        btn_clear.addActionListener(e -> clear());
 
         oper.add(btn_mult);
         oper.add(btn_div);
@@ -93,6 +106,9 @@ public class CalcFrame extends JFrame {
         btn_div.setBounds(20, 210, 50, 50);
         btn_sub.setBounds(20, 270, 50, 50);
         btn_add.setBounds(20, 330, 50, 50);
+
+        btn_dec.setBounds(270, 30, 50, 50);
+        btn_neg.setBounds(270, 90, 50, 50);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
@@ -143,6 +159,9 @@ public class CalcFrame extends JFrame {
         add(btn_sub);
         add(btn_add);
 
+        add(btn_dec);
+        add(btn_neg);
+
         add(btn_clear);
         add(btn_equ);
 
@@ -156,39 +175,120 @@ public class CalcFrame extends JFrame {
     }
 
     public void input(int num) {
+        in = in * 10 + num;
+        if(dec)
+            in /= 10.0;
         lbl_operation.setText(lbl_operation.getText() + num);
-        if(stringF) {
-            operf.append(num);
-        } else {
-            opert.append(num);
-        }
     }
 
     public void calc() {
-        lbl_result.setText(lbl_result.getText() + comp());
+        op = comp(); in = 0;
+        opre = "";
+        //System.out.println(op);
+        lbl_result.setText("Result: " + op);
     }
 
     public double comp() {
-        Double num1 = Double.parseDouble(operf.toString());
-        Double num2 = Double.parseDouble(opert.toString());
-
+        double res = op;
         switch (opre) {
-            case "+":
-                return num1 + num2;
-            case "-":
-                return num1 - num2;
-            case "x":
-                return num1 * num2;
-            case "/":
-                return num1/num2;
-            default:
-                return num1;
-
+            case " + ":
+                res =  op + in;
+                break;
+            case " - ":
+                res = op - in;
+                break;
+            case " * ":
+                res = op * in;
+                break;
+            case " / ":
+                res = op / in;
+                break;
         }
+        return res;
     }
 
     public void add() {
-
+        if(dec)
+            dec = false;
+        if(op == 0 && in != 0.0) {
+            op = in; in = 0;
+            opre = " + ";
+            lbl_operation.setText(op + " + ");
+        } else if(in == 0) {
+            lbl_operation.setText(op + " + ");
+            opre = " + ";
+        } else {
+            op = comp(); in = 0;
+            lbl_operation.setText(op + opre);
+        }
     }
 
+    public void sub() {
+        if(dec)
+            dec = false;
+        if(op == 0 && in != 0.0) {
+            op = in; in = 0;
+            opre = " - ";
+            lbl_operation.setText(op + opre);
+        } else if(in == 0) {
+            opre = " - ";
+            lbl_operation.setText(op + opre);
+        } else {
+            op = comp(); in = 0;
+            lbl_operation.setText(op + opre);
+        }
+    }
+
+    public void mult() {
+        if(dec)
+            dec = false;
+        if(op == 0 && in != 0.0) {
+            op = in; in = 0;
+            opre = " * ";
+            lbl_operation.setText(op + opre);
+        } else if(in == 0) {
+            opre = " * ";
+            lbl_operation.setText(op + opre);
+        } else {
+            op = comp(); in = 0;
+            lbl_operation.setText(op + opre);
+        }
+    }
+
+    public void div() {
+        if(dec)
+            dec = false;
+        if(op == 0 && in != 0.0) {
+            op = in; in = 0;
+            opre = " / ";
+            lbl_operation.setText(op + opre);
+        } else if(in == 0) {
+            opre = " / ";
+            lbl_operation.setText(op + opre);
+        } else {
+            op = comp(); in = 0;
+            lbl_operation.setText(op + opre);
+        }
+    }
+
+    public void clear() {
+        opre = "";
+        op = 0; in = 0;
+        dec = false;
+        lbl_result.setText("Result: ");
+        lbl_operation.setText("");
+    }
+
+    public void dec() {
+        if(!dec) {
+            dec = true;
+            lbl_operation.setText(lbl_operation.getText() + ".");
+        }
+    }
+
+    public void neg() {
+        if(in == 0) {
+            in *= -1;
+        }
+    }
 }

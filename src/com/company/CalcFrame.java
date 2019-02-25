@@ -10,7 +10,7 @@ public class CalcFrame extends JFrame {
     JTextField txt_operand1 = new JTextField();
     //JLabel lbl_operand2 = new JLabel("Operand2: ");
     JTextField txt_operand2 = new JTextField();
-    JTextField lbl_result = new JTextField("Result: ");
+    JTextField lbl_result = new JTextField("");
 
     StringBuffer operf = new StringBuffer();
     StringBuffer opert = new StringBuffer();
@@ -48,6 +48,8 @@ public class CalcFrame extends JFrame {
     double in = 0;
 
     boolean dec = false;
+
+    double dcount = 0;
 
     public CalcFrame(String name) {
         super(name);
@@ -175,21 +177,32 @@ public class CalcFrame extends JFrame {
     }
 
     public void input(int num) {
-        in = in * 10 + num;
+        double ni = in;
+        if(op != 0 && opre.equals(""))
+            clear();
+        in = (in * 10) + num;
         if(dec)
-            in /= 10.0;
-        lbl_operation.setText(lbl_operation.getText() + num);
+            dcount++;
+        lbl_result.setText(lbl_result.getText() + num);
+
     }
 
     public void calc() {
         op = comp(); in = 0;
         opre = "";
         //System.out.println(op);
-        lbl_result.setText("Result: " + op);
+        lbl_result.setText("" + op);
+        lbl_operation.setText("" + op);
     }
 
     public double comp() {
         double res = op;
+        if(dec)
+            in /= Math.pow(10, dcount);
+        dcount = 0;
+        dec = false;
+        if(op == 0 || opre == null)
+            return in;
         switch (opre) {
             case " + ":
                 res =  op + in;
@@ -208,66 +221,84 @@ public class CalcFrame extends JFrame {
     }
 
     public void add() {
-        if(dec)
+        if(dec) {
+            in /= Math.pow(10.0, dcount);
             dec = false;
+        }
         if(op == 0 && in != 0.0) {
             op = in; in = 0;
             opre = " + ";
             lbl_operation.setText(op + " + ");
+            lbl_result.setText("");
         } else if(in == 0) {
+            lbl_result.setText("");
             lbl_operation.setText(op + " + ");
             opre = " + ";
         } else {
             op = comp(); in = 0;
-            lbl_operation.setText(op + opre);
+            opre = " + ";
+            lbl_result.setText(op + opre);
         }
     }
 
     public void sub() {
-        if(dec)
+        if(dec) {
+            in /= Math.pow(10.0, dcount);
             dec = false;
+        }
         if(op == 0 && in != 0.0) {
             op = in; in = 0;
             opre = " - ";
-            lbl_operation.setText(op + opre);
+            lbl_operation.setText(op + " - ");
+            lbl_result.setText("");
         } else if(in == 0) {
+            lbl_result.setText("");
+            lbl_operation.setText(op + " - ");
             opre = " - ";
-            lbl_operation.setText(op + opre);
         } else {
             op = comp(); in = 0;
-            lbl_operation.setText(op + opre);
+            opre = " - ";
+            lbl_result.setText(op + opre);
         }
     }
-
     public void mult() {
-        if(dec)
+        if(dec) {
+            in /= Math.pow(10.0, dcount);
             dec = false;
+        }
         if(op == 0 && in != 0.0) {
             op = in; in = 0;
             opre = " * ";
-            lbl_operation.setText(op + opre);
+            lbl_operation.setText(op + " * ");
+            lbl_result.setText("");
         } else if(in == 0) {
+            lbl_result.setText("");
+            lbl_operation.setText(op + " * ");
             opre = " * ";
-            lbl_operation.setText(op + opre);
         } else {
             op = comp(); in = 0;
-            lbl_operation.setText(op + opre);
+            opre = " * ";
+            lbl_result.setText(op + opre);
         }
     }
-
     public void div() {
-        if(dec)
+        if(dec) {
+            in /= Math.pow(10.0, dcount);
             dec = false;
+        }
         if(op == 0 && in != 0.0) {
             op = in; in = 0;
             opre = " / ";
-            lbl_operation.setText(op + opre);
+            lbl_operation.setText(op + " / ");
+            lbl_result.setText("");
         } else if(in == 0) {
+            lbl_result.setText("");
+            lbl_operation.setText(op + " / ");
             opre = " / ";
-            lbl_operation.setText(op + opre);
         } else {
             op = comp(); in = 0;
-            lbl_operation.setText(op + opre);
+            opre = " / ";
+            lbl_result.setText(op + opre);
         }
     }
 
@@ -275,20 +306,21 @@ public class CalcFrame extends JFrame {
         opre = "";
         op = 0; in = 0;
         dec = false;
-        lbl_result.setText("Result: ");
+        lbl_result.setText("");
         lbl_operation.setText("");
     }
 
     public void dec() {
-        if(!dec) {
+        if(!dec && !opre.equals("")) {
             dec = true;
-            lbl_operation.setText(lbl_operation.getText() + ".");
+            lbl_result.setText(lbl_result.getText() + ".");
         }
     }
 
     public void neg() {
-        if(in == 0) {
+        if(in != 0) {
             in *= -1;
+            lbl_result.setText(""+in);
         }
     }
 }
